@@ -30,15 +30,19 @@ import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.StringByteIterator;
 
-import redis.clients.jedis.Jedis;
+//import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Protocol;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+
 
 /**
  * YCSB binding for <a href="http://redis.io/">Redis</a>.
@@ -47,7 +51,9 @@ import java.util.Vector;
  */
 public class RedisClient extends DB {
 
-  private Jedis jedis;
+  //private Jedis jedis;
+
+  private JedisCluster jedis;
 
   public static final String HOST_PROPERTY = "redis.host";
   public static final String PORT_PROPERTY = "redis.port";
@@ -67,17 +73,26 @@ public class RedisClient extends DB {
     }
     String host = props.getProperty(HOST_PROPERTY);
 
-    jedis = new Jedis(host, port);
-    jedis.connect();
+    Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedisClusterNodes.add(new HostAndPort("127.0.0.1", port));
+    jedis = new JedisCluster(jedisClusterNodes);
+
+    //jedis = new Jedis(host, port);
+    //jedis.connect();
 
     String password = props.getProperty(PASSWORD_PROPERTY);
     if (password != null) {
-      jedis.auth(password);
+      // jedis.auth(password);
     }
   }
 
   public void cleanup() throws DBException {
-    jedis.disconnect();
+   // jedis.disconnect();
   }
 
   /*
